@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AnimalRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,6 +33,24 @@ class Animal
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $etatSante = null;
+
+    /**
+     * @var Collection<int, CompteRendu>
+     */
+    #[ORM\OneToMany(targetEntity: CompteRendu::class, mappedBy: 'animal')]
+    private Collection $compteRendus;
+
+    /**
+     * @var Collection<int, Alimentation>
+     */
+    #[ORM\OneToMany(targetEntity: Alimentation::class, mappedBy: 'animal')]
+    private Collection $no;
+
+    public function __construct()
+    {
+        $this->compteRendus = new ArrayCollection();
+        $this->no = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,6 +125,66 @@ class Animal
     public function setEtatSante(?string $etatSante): static
     {
         $this->etatSante = $etatSante;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompteRendu>
+     */
+    public function getCompteRendus(): Collection
+    {
+        return $this->compteRendus;
+    }
+
+    public function addCompteRendu(CompteRendu $compteRendu): static
+    {
+        if (!$this->compteRendus->contains($compteRendu)) {
+            $this->compteRendus->add($compteRendu);
+            $compteRendu->setAnimal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompteRendu(CompteRendu $compteRendu): static
+    {
+        if ($this->compteRendus->removeElement($compteRendu)) {
+            // set the owning side to null (unless already changed)
+            if ($compteRendu->getAnimal() === $this) {
+                $compteRendu->setAnimal(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Alimentation>
+     */
+    public function getNo(): Collection
+    {
+        return $this->no;
+    }
+
+    public function addNo(Alimentation $no): static
+    {
+        if (!$this->no->contains($no)) {
+            $this->no->add($no);
+            $no->setAnimal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNo(Alimentation $no): static
+    {
+        if ($this->no->removeElement($no)) {
+            // set the owning side to null (unless already changed)
+            if ($no->getAnimal() === $this) {
+                $no->setAnimal(null);
+            }
+        }
 
         return $this;
     }
