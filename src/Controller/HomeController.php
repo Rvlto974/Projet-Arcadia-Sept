@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Controller;
+
+use App\Repository\HabitatRepository;
+use App\Repository\AnimalRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+
+final class HomeController extends AbstractController
+{
+    #[Route("/", name: "app_home")]
+    public function index(HabitatRepository $habitatRepo): Response
+    {
+        $habitats = $habitatRepo->findAll();
+        return $this->render("home/index.html.twig", [
+            "habitats" => $habitats,
+        ]);
+    }
+
+    #[Route("/habitat/{id}", name: "app_habitat_detail")]
+    public function habitat(int $id, HabitatRepository $habitatRepo): Response
+    {
+        $habitat = $habitatRepo->find($id);
+        if (!$habitat) {
+            throw $this->createNotFoundException("Habitat non trouvé");
+        }
+        return $this->render("home/habitat.html.twig", [
+            "habitat" => $habitat,
+        ]);
+    }
+
+    #[Route("/animal/{id}", name: "app_animal_detail")]
+    public function animal(int $id, AnimalRepository $animalRepo): Response
+    {
+        $animal = $animalRepo->find($id);
+        if (!$animal) {
+            throw $this->createNotFoundException("Animal non trouvé");
+        }
+        return $this->render("home/animal.html.twig", [
+            "animal" => $animal,
+        ]);
+    }
+}
